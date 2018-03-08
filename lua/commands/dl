@@ -1,0 +1,66 @@
+-- https://pastebin.com/vUwfGL6P
+-- #> pastebin get vUwfGL6P dl
+
+
+local base_url = "http://ftb.poixson.com/lua"
+
+
+local args = { ... }
+local run = false
+local filename = ""
+if #args < 1 then
+  print("Filename argument is required!")
+  return
+end
+if args[1] == "list" then
+  -- get list of files
+  local page = http.get("http://ftb.poixson.com/lua/list.php")
+  local contents = page.readAll()
+  if (contents == nil) then
+    error ("Failed to get list of files")
+    return
+  end
+  term.clear()
+  term.setCursorPos(1, 1)
+  print(contents)
+  return
+end
+if args[1] == "run" then
+  term.clear()
+  term.setCursorPos(1, 1)
+  if #args < 2 then
+    print("Filename argument is required!")
+    return
+  end
+  run = true
+  filename = args[2]
+else
+  filename = args[1]
+end
+
+print("Downloading file: " .. filename)
+local text = ""
+local web = http.get(base_url .. "/" .. filename)
+if web ~= nil then
+  text = web:readAll()
+  web:close()
+end
+
+if text ~= "" then
+  local out = fs.open("/" .. filename, "w")
+  out.write(text)
+  out.close()
+  print("Successful!")
+  if run then
+    os.sleep(0.5)
+  else
+    os.sleep(0.1)
+  end
+else
+  print("Failed to download")
+  os.sleep(5)
+end
+
+if run then
+  shell.run("/" .. filename)
+end
