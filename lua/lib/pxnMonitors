@@ -1,0 +1,201 @@
+-- ----------------------------------------
+-- PoiXson - Monitor Tools
+-- license GPL-3
+-- author lorenzo at poixson.com
+-- link http://ftb.poixson.com/lua/
+-- ----------------------------------------
+
+
+
+monitorsFilename = "/configs/monitor_names"
+
+
+
+-- ----------------------------------------
+-- do not change below line
+
+
+
+posX = 1
+posY = 1
+
+monitors = {}
+
+
+
+-- ----------------------------------------
+-- global functions
+
+
+
+kill     = function()    pxnCommon.kill()               end
+isEmpty  = function(str) return pxnCommon.isEmpty(str)  end
+notEmpty = function(str) return pxnCommon.notEmpty(str) end
+
+
+
+-- ----------------------------------------
+-- monitor functions
+
+
+
+function DetectMonitors()
+  local filename = monitorsFilename
+  -- create monitors file
+  if not pxnCommon.isFile(filename) then
+    clear()
+    println()
+    print("What is the name of your monitor? ")
+    local answer = io.read()
+    println()
+    local h = fs.open(filename, "w")
+    if h == nil then
+      pos(1, 1) error("Failed to create file: " .. filename) kill()
+    end
+    if notEmpty(answer) then
+      h.write(answer .. "\n")
+    end
+    h.close()
+    println()
+    println("Created file: " .. filename)
+    os.sleep(1)
+  end
+  -- read monitors file
+  local lines = pxnCommon.LinesFromFile(filename)
+  if lines ~= nil then
+    if #lines > 0 then
+      local index = 0
+      local found = {}
+      for i, name in ipairs(lines) do
+        if notEmpty(name) then
+          if index == 0 then
+            println("Monitors:")
+          end
+          index = index + 1
+          if peripheral.isPresent(name) then
+            println("  " .. name)
+            local mon = peripheral.wrap(name)
+            if mon == nil then
+              error("Failed to load monitor: " .. name)
+            else
+              found[index] = mon
+              mon.clear()
+              mon.setCursorPos(1, 1)
+            end
+          else
+            error("Monitor not found: " .. name)
+          end
+        end
+      end
+      monitors = found
+    end
+  end
+end
+
+
+
+function clear(mon)
+  if mon == nil then
+    term.clear()
+    term.setCursorPos(1, 1)
+    for index, mon in ipairs(monitors) do
+      mon.clear()
+      mon.setCursorPos(1, 1)
+    end
+  else
+    mon.clear()
+    mon.setCursorPos(1, 1)
+  end
+  posX = 1
+  posY = 1
+end
+
+
+
+function pos(x, y, mon)
+  if x ~= nil then
+    posX = x
+  end
+  if y ~= nil then
+    posY = y
+  end
+  if mon == nil then
+    term.setCursorPos(posX, posY)
+    for index, mon in ipairs(monitors) do
+      mon.setCursorPos(posX, posY)
+    end
+  else
+    mon.setCursorPos(posX, posY)
+  end
+end
+
+
+
+-- ----------------------------------------
+-- print
+
+
+
+function print(msg, mon)
+  if mon == nil then
+    print(msg, term)
+    for index, mon in ipairs(monitors) do
+      if mon ~= nil then
+        print(msg, mon)
+      end
+    end
+    return
+  end
+  if msg ~= nil then
+    mon.write(msg)
+  end
+end
+function println(msg, mon)
+  if msg == nil then
+    pos(1, posY + 1, mon)
+  else
+    print(msg, mon)
+    pos(1, posY + 1, mon)
+  end
+end
+
+
+
+function center(msg, y, mon)
+  if y == nil then
+    y = posY
+  end
+  if mon == nil then
+    center(msg, y, term)
+    for index, mon in ipairs(monitors) do
+      center(msg, y, mon)
+    end
+    return
+  end
+  local sizeX, sizeY = mon.getSize()
+  local len = string.len(msg)
+  mon.setCursorPos(
+    math.floor( ((sizeX - len) / 2.0) + 1.0 ),
+    y
+  )
+  mon.write(msg)
+end
+function right(msg, y, mon)
+  if y == nil then
+    y = posY
+  end
+  if mon == nil then
+    right(msg, y, term)
+    for index, mon in ipairs(monitors) do
+      right(msg, y, mon)
+    end
+    return
+  end
+  local sizeX, sizeY = mon.getSize()
+  local len = string.len(msg)
+  mon.setCursorPos(
+    (sizeX - len) + 1,
+    y
+  )
+  mon.write(msg)
+end

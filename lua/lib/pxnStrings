@@ -1,0 +1,20 @@
+-- ----------------------------------------
+-- PoiXson - String Tools
+-- license GPL-3
+-- author lorenzo at poixson.com
+-- link http://ftb.poixson.com/lua/
+-- ----------------------------------------
+
+
+
+function strRepeat(count, char)
+  if count <= 0 then
+    return ""
+  end
+  if pxnCommon.isEmpty(char) then char = " " end
+  local str = ""
+  for i=1,count,1 do
+    str = str .. char
+  end
+  return str
+end
