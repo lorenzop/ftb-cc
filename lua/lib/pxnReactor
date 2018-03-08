@@ -1,0 +1,21 @@
+-- ----------------------------------------
+-- PoiXson - Reactor Tools
+-- license GPL-3
+-- author lorenzo at poixson.com
+-- link http://ftb.poixson.com/lua/
+-- ----------------------------------------
+
+
+
+reactorFilename = "/configs/reactor_name"
+
+UpdateDelay   = 3
+
+-- rod config
+
+
+
+-- ----------------------------------------
+-- do not change below line
+
+

@@ -1,0 +1,17 @@
+-- ----------------------------------------
+-- PoiXson - Battery Interface
+-- license GPL-3
+-- author lorenzo at poixson.com
+-- link http://ftb.poixson.com/lua/
+-- ----------------------------------------
+
+
+
+batteriesFilename = "/configs/battery_names"
+
+
+
+-- ----------------------------------------
+-- do not change below line
+
+
