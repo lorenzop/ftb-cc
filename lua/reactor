@@ -1,0 +1,36 @@
+-- ----------------------------------------
+-- PoiXson - Reactor Controller
+-- license GPL-3
+-- author lorenzo at poixson.com
+-- link http://ftb.poixson.com/lua/
+-- ----------------------------------------
+os.loadAPI("/lib/pxnCommon")
+--os.loadAPI("/lib/pxnReactor")
+-- ----------------------------------------
+
+
+
+local UpdateDelay   = 5
+
+
+
+-- ----------------------------------------
+-- do not change below line
+
+
+
+pxnCommon.InstallStartup(
+  "reactor",
+  "lib/pxnReactor",
+  "lib/pxnBatteries"
+)
+
+
+
+pxnMonitors.DetectMonitors()
+pxnReactor.DetectReactor()
+
+
+
+--os.sleep(3)
+--pxnCommon.shutdown()
