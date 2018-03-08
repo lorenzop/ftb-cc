@@ -1,0 +1,179 @@
+-- ----------------------------------------
+-- PoiXson - Common Lua
+-- license GPL-3
+-- author lorenzo at poixson.com
+-- link http://ftb.poixson.com/lua/
+-- ----------------------------------------
+
+
+
+startupDelay  = 5
+
+
+
+-- ----------------------------------------
+-- do not change below line
+
+
+
+os.loadAPI("/lib/pxnStrings")
+os.loadAPI("/lib/pxnMonitors")
+
+
+
+stopping = false
+monitors = {}
+
+
+
+-- ----------------------------------------
+-- global functions
+
+
+
+clear  = function()     pxnMonitors.clear()     end
+pos    = function(x, y) pxnMonitors.pos(x, y)   end
+center = function(msg)  pxnMonitors.center(msg) end
+strRepeat = function(count, char) return pxnStrings.strRepeat(count, char) end
+
+
+
+-- ----------------------------------------
+-- startup / shutdown
+
+
+
+clear()
+
+
+
+function InstallStartup(scriptFile, ...)
+  local filename = "/startup"
+  if not isFile(filename) then
+    println("Creating startup file..")
+    local h = fs.open(filename, "w")
+    if h == nil then
+      pos(1, 1) error("Failed to create file: " .. filename) kill()
+    end
+    println("  " .. scriptFile)
+    println("  lib/pxnCommon")
+    println("  lib/pxnStrings")
+    println("  lib/pxnMonitors")
+    h.write( "shell.run( \"dl lib/pxnCommon\"   )\n" )
+    h.write( "shell.run( \"dl lib/pxnStrings\"  )\n" )
+    h.write( "shell.run( \"dl lib/pxnMonitors\" )\n" )
+    for i,v in ipairs(arg) do
+      println("  " .. v)
+      h.write( "shell.run( \"dl " .. v .. "\" )\n" )
+    end
+    h.write( "shell.run( \"dl "..scriptFile.."\" )\n" )
+--    h.write( "os.sleep(1)" )
+    h.write( "term.clear() term.setCursorPos(1, 1)" )
+    h.write( "shell.run( \"" .. scriptFile .. "\")" )
+    h.close()
+    os.sleep(1)
+  end
+end
+
+
+
+function shutdown()
+  stopping = true
+  for i=0,3 do
+    pos(1, 1) center("+------------------+")
+    pos(1, 2) center("|                  |")
+    pos(1, 3) center(
+      "|    Stopping"
+      .. strRepeat(i,   ".")
+      .. strRepeat(3-i, " ")
+      .. "   |"
+    )
+    pos(1, 4) center("|                  |")
+    pos(1, 5) center("+------------------+")
+    pos(1, 1)
+    os.sleep(0.25)
+  end
+  clear()
+  kill()
+end
+function kill()
+  stopping = true
+  do return end
+end
+
+
+
+-- ----------------------------------------
+-- file functions
+
+
+
+function isEmpty(str)
+  return str == nil or str == ""
+end
+function notEmpty(str)
+  return str ~= nil and str ~= ""
+end
+
+
+
+function isFile(filename)
+  local h = fs.open(filename, "r")
+  if h == nil then
+    return false
+  end
+  h.close()
+  return true
+end
+function notFile(filename)
+  local h = fs.open(filename, "r")
+  if h == nil then
+    return true
+  end
+  h.close()
+  return false
+end
+
+
+
+function LineFromFile(filename)
+  if isEmpty(filename) then
+    pos(1, 1) error("filename argument is required!") kill()
+  end
+  if notFile(filename) then
+    return nil
+  end
+  local h = fs.open(filename, "r")
+  if h == nil then
+    pos(1, 1)
+    error("Failed to read file: " .. filename)
+  end
+  local line = h.readLine()
+  h.close()
+  return line
+end
+function LinesFromFile(filename)
+  if isEmpty(filename) then
+    pos(1, 1) error("filename argument is required!") kill()
+  end
+  if notFile(filename) then
+    return nil
+  end
+  local h = fs.open(filename, "r")
+  if h == nil then
+    pos(1, 1)
+    error("Failed to read file: " .. filename)
+  end
+  local lines = {}
+  local index = 0
+  while true do
+    index = index + 1
+    local line = h.readLine()
+    if line == nil then
+      break
+    end
+    lines[index] = line
+  end
+  h.close()
+  return lines
+end
