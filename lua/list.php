@@ -1,4 +1,11 @@
 <?php
+/*
+ * PoiXson - List files for dl lua script
+ * license GPL-3
+ * author lorenzo at poixson.com
+ * link http://ftb.poixson.com/lua/
+ */
+
 header("Content-Type: text/plain");
 
 $entries = \scandir('./');
