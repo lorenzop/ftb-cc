@@ -1,0 +1,2 @@
+local args = { ... }
+shell.run( "ls " .. table.concat(args, " ") )
