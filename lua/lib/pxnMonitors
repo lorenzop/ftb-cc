@@ -29,7 +29,6 @@ monitors = {}
 
 
 
-kill     = function()    pxnCommon.kill()               end
 isEmpty  = function(str) return pxnCommon.isEmpty(str)  end
 notEmpty = function(str) return pxnCommon.notEmpty(str) end
 
@@ -43,10 +42,10 @@ notEmpty = function(str) return pxnCommon.notEmpty(str) end
 function DetectMonitors()
   local filename = monitorsFilename
   -- create monitors file
-  if not pxnCommon.isFile(filename) then
+  if pxnCommon.notFile(filename) then
     clear()
     println()
-    print("What is the name of your monitor? ")
+    print("What side or name is the monitor? ")
     local answer = io.read()
     println()
     local h = fs.open(filename, "w")
@@ -58,38 +57,37 @@ function DetectMonitors()
     end
     h.close()
     println()
-    println("Created file: " .. filename)
-    os.sleep(1)
+    print("Created file: " .. filename)
+    sleepdot(1)
   end
   -- read monitors file
-  local lines = pxnCommon.LinesFromFile(filename)
-  if lines ~= nil then
-    if #lines > 0 then
-      local index = 0
-      local found = {}
-      for i, name in ipairs(lines) do
-        if notEmpty(name) then
-          if index == 0 then
-            println("Monitors:")
+  local lines = pxnCommon.readLinesFromFile(filename)
+  if lines ~= nil and #lines > 0 then
+    local index = 0
+    local found = {}
+    for _, name in ipairs(lines) do
+      if notEmpty(name) then
+        if index == 0 then
+          println()
+          println("Found Monitors:")
+        end
+        index = index + 1
+        if peripheral.isPresent(name) then
+          println("  " .. name)
+          local mon = peripheral.wrap(name)
+          if mon == nil then
+            pos(1, 1) error("Failed to load monitor: " .. name) sleepdot(1) return
           end
-          index = index + 1
-          if peripheral.isPresent(name) then
-            println("  " .. name)
-            local mon = peripheral.wrap(name)
-            if mon == nil then
-              error("Failed to load monitor: " .. name)
-            else
-              found[index] = mon
-              mon.clear()
-              mon.setCursorPos(1, 1)
-            end
-          else
-            error("Monitor not found: " .. name)
-          end
+          found[index] = mon
+          mon.clear()
+          mon.setCursorPos(1, 1)
+          mon.write("Detected: " .. name .. "\n")
+        else
+          pos(1, 1) error("Monitor not found: " .. name) sleepdot(1) return
         end
       end
-      monitors = found
-    end
+    end -- end for
+    monitors = found
   end
 end
 
@@ -101,7 +99,7 @@ function clear(mon)
     term.setBackgroundColor(bgColor)
     term.clear()
     term.setCursorPos(1, 1)
-    for index, mon in ipairs(monitors) do
+    for _, mon in ipairs(monitors) do
       mon.clear()
       mon.setBackgroundColor(bgColor)
       mon.clear()
@@ -128,7 +126,7 @@ function pos(x, y, mon)
   end
   if mon == nil then
     term.setCursorPos(posX, posY)
-    for index, mon in ipairs(monitors) do
+    for _, mon in ipairs(monitors) do
       mon.setCursorPos(posX, posY)
     end
   else
@@ -138,8 +136,28 @@ end
 
 
 
-function setBgColor(color)
+
+function setColor(color, mon)
+  foreColor = color
+  if mon == nil then
+    term.setTextColor(color)
+    for _, mon in monitors do
+      mon.setTextColor(color)
+    end
+  else
+    mon.setTextColor(color)
+  end
+end
+function setBgColor(color, mon)
   bgColor = color
+  if mon == nil then
+    term.setBackgroundColor(color)
+    for _, mon in monitors do
+      mon.setBackgroundColor(color)
+    end
+  else
+    mon.setBackgroundColor(color)
+  end
 end
 
 
@@ -150,16 +168,17 @@ end
 
 
 function print(msg, mon)
+  if isEmpty(msg) then
+    return
+  end
   if mon == nil then
     print(msg, term)
-    for index, mon in ipairs(monitors) do
+    for _, mon in ipairs(monitors) do
       if mon ~= nil then
         print(msg, mon)
       end
     end
-    return
-  end
-  if msg ~= nil then
+  else
     mon.write(msg)
   end
 end
@@ -180,7 +199,7 @@ function center(msg, y, mon)
   end
   if mon == nil then
     center(msg, y, term)
-    for index, mon in ipairs(monitors) do
+    for _, mon in ipairs(monitors) do
       center(msg, y, mon)
     end
     return
@@ -192,6 +211,8 @@ function center(msg, y, mon)
     y
   )
   mon.write(msg)
+  posX = 1
+  posY = y + 1
 end
 function right(msg, y, mon)
   if y == nil then
@@ -199,7 +220,7 @@ function right(msg, y, mon)
   end
   if mon == nil then
     right(msg, y, term)
-    for index, mon in ipairs(monitors) do
+    for _, mon in ipairs(monitors) do
       right(msg, y, mon)
     end
     return
@@ -211,6 +232,8 @@ function right(msg, y, mon)
     y
   )
   mon.write(msg)
+  posX = 1
+  posY = y + 1
 end
 
 
