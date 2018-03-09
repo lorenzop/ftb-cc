@@ -35,6 +35,7 @@ clear  = function()     pxnMonitors.clear()     end
 pos    = function(x, y) pxnMonitors.pos(x, y)   end
 center = function(msg)  pxnMonitors.center(msg) end
 strRepeat = function(count, char) return pxnStrings.strRepeat(count, char) end
+sleepdot = function(time, dots) pxnMonitors.sleepdot(time, dots) end
 
 
 
@@ -53,7 +54,7 @@ function InstallStartup(scriptFile, ...)
     println("Creating startup file..")
     local h = fs.open(filename, "w")
     if h == nil then
-      pos(1, 1) error("Failed to create file: " .. filename) kill()
+      pos(1, 1) error("Failed to create file: " .. filename) sleepdot(1) return
     end
     println("  " .. scriptFile)
     println("  lib/pxnCommon")
@@ -138,15 +139,14 @@ end
 
 function LineFromFile(filename)
   if isEmpty(filename) then
-    pos(1, 1) error("filename argument is required!") kill()
+    pos(1, 1) error("filename argument is required!") sleepdot(1) return nil
   end
   if notFile(filename) then
     return nil
   end
   local h = fs.open(filename, "r")
   if h == nil then
-    pos(1, 1)
-    error("Failed to read file: " .. filename)
+    pos(1, 1) error("Failed to read file: " .. filename) sleepdot(1) return nil
   end
   local line = h.readLine()
   h.close()
@@ -154,15 +154,14 @@ function LineFromFile(filename)
 end
 function LinesFromFile(filename)
   if isEmpty(filename) then
-    pos(1, 1) error("filename argument is required!") kill()
+    pos(1, 1) error("filename argument is required!") sleepdot(1) return nil
   end
   if notFile(filename) then
     return nil
   end
   local h = fs.open(filename, "r")
   if h == nil then
-    pos(1, 1)
-    error("Failed to read file: " .. filename)
+    pos(1, 1) error("Failed to read file: " .. filename) sleepdot(1) return nil
   end
   local lines = {}
   local index = 0
