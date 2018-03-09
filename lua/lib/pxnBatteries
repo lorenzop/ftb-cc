@@ -1,5 +1,5 @@
 -- ----------------------------------------
--- PoiXson - Battery Interface
+-- PoiXson - Battery Tools
 -- license GPL-3
 -- author lorenzo at poixson.com
 -- link http://ftb.poixson.com/lua/
@@ -15,3 +15,72 @@ batteriesFilename = "/configs/battery_names"
 -- do not change below line
 
 
+
+batteries = {}
+
+
+
+-- ----------------------------------------
+-- global functions
+
+
+
+isEmpty  = function(str) return pxnCommon.isEmpty(str)  end
+notEmpty = function(str) return pxnCommon.notEmpty(str) end
+sleepdot = function(time, dots) pxnMonitors.sleepdot(time, dots) end
+
+
+
+-- ----------------------------------------
+-- battery functions
+
+
+
+function DetectBatteries()
+  local filename = batteriesFilename
+  -- create batteries file
+  if (pxnCommon.notFile(filename) then
+    clear()
+    println()
+    print("What name is the battery modem?)
+    local answer = io.read()
+    println()
+    local h = fs.open(filename, "w")
+    if h == nil then
+      pos(1, 1) error("Failed to create file: " .. filename) sleepdot(1) return
+    end
+    if notEmpty(answer) then
+      h.write(answer .. "\n")
+    end
+    h.close()
+    println()
+    print("Created file: " .. filename)
+    sleepdot(1)
+  end
+  -- read batteries file
+  local lines = pxnCommon.readLinesFromFile(filename)
+  if lines ~= nil and #lines > 0 then
+    local index = 0
+    local found = {}
+    for _, name in ipairs(lines) do
+      if notEmpty(name) then
+        if index == 0 then
+          println()
+          println("Found Batteries:")
+        end
+        index = index + 1
+        if peripheral.isPresent(name) then
+          println("  " .. name)
+          local modem = peripheral.wrap(name)
+          if modem == nil then
+            pos(1, 1) error("Failed to load battery: " .. name) sleepdot(1) return
+          end
+          found[index] = modem
+        else
+          pos(1, 1) error(Battery not found: " .. name) sleepdot(1) return
+        end
+      end
+    end
+    batteries = found
+  end
+end
