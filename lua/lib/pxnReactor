@@ -19,3 +19,67 @@ UpdateDelay   = 3
 -- do not change below line
 
 
+
+-- ----------------------------------------
+-- global functions
+
+
+
+isEmpty  = function(str) return pxnCommon.isEmpty(str)  end
+notEmpty = function(str) return pxnCommon.notEmpty(str) end
+
+clear   = function()         pxnMonitors.clear()           end
+pos     = function(x, y)     pxnMonitors.pos(x, y)         end
+center  = function(msg)      pxnMonitors.center(msg)       end
+print   = function(msg, mon) pxnMonitors.print(msg, mon)   end
+println = function(msg, mon) pxnMonitors.println(msg, mon) end
+sleepdot = function(time, dots) pxnMonitors.sleepdot(time, dots) end
+
+
+
+-- ----------------------------------------
+-- reactor functions
+
+
+
+function DetectReactor()
+  local filename = reactorFilename
+  -- create reactor file
+  if pxnCommon.notFile(filename) then
+    clear()
+    println()
+    print("What side or name is the reactor? ")
+    local answer = io.read()
+    println()
+    if isEmpty(answer) then
+      pos(1, 1) error("A reactor name or side is required to use this program!") sleepdot(1) return
+    end
+    local h = fs.open(filename, "w")
+    if h == nil then
+      pos(1, 1) error("Failed to create file: " .. filename) sleepdot(1) return
+    end
+    if notEmpty(answer) then
+      h.write(answer .. "\n")
+    end
+    h.close()
+    println()
+    println("Created file: " .. filename)
+    os.sleep(1)
+  end
+  -- read reactor file
+  local name = pxnCommon.readLineFromFile(filename)
+  if isEmpty(name) then
+    pos(1, 1) error("Failed to read file: " .. filename) sleepdot(1) return
+  end
+  if not peripheral.isPresent(name) then
+    pos(1, 1) error("Reactor not detected") sleepdot(1) return
+  end
+  local perf = peripheral.wrap(name)
+  if perf == nil then
+    pos(1, 1) error("Failed to detect reactor") sleepdot(1) return
+  end
+  println()
+  println("Found Reactor:")
+  println("  " .. name)
+  return perf
+end
