@@ -212,3 +212,18 @@ function right(msg, y, mon)
   )
   mon.write(msg)
 end
+
+
+
+function sleepdot(time, dots)
+  if dots == nil then
+    dots = 3
+  end
+  interval = (time / (dots + 1.0))
+  for i = 0,dots,1 do
+    if i > 0 then
+      print(".")
+    end
+    os.sleep(interval)
+  end
+end
