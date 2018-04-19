@@ -7,16 +7,13 @@
 
 
 
-reactorFilename = "/configs/reactor_name"
-
-UpdateDelay   = 3
-
--- rod config
-
-
-
 -- ----------------------------------------
--- do not change below line
+-- DO NOT CHANGE BELOW LINE
+-- ----------------------------------------
+
+
+
+reactors = {}
 
 
 
@@ -28,11 +25,14 @@ UpdateDelay   = 3
 isEmpty  = function(str) return pxnCommon.isEmpty(str)  end
 notEmpty = function(str) return pxnCommon.notEmpty(str) end
 
-clear   = function()         pxnMonitors.clear()           end
-pos     = function(x, y)     pxnMonitors.pos(x, y)         end
-center  = function(msg)      pxnMonitors.center(msg)       end
-print   = function(msg, mon) pxnMonitors.print(msg, mon)   end
-println = function(msg, mon) pxnMonitors.println(msg, mon) end
+isStopping = function()  return pxnCommon.isStopping()  end
+shutdown   = function()  return pxnCommon.shutdown()    end
+
+clear    = function()           pxnMonitors.clear()              end
+pos      = function(x, y)       pxnMonitors.pos(x, y)            end
+print    = function(msg, mon)   pxnMonitors.print(msg, mon)      end
+println  = function(msg, mon)   pxnMonitors.println(msg, mon)    end
+center   = function(msg, y)     pxnMonitors.center(msg, y)       end
 sleepdot = function(time, dots) pxnMonitors.sleepdot(time, dots) end
 
 
