@@ -7,6 +7,12 @@
 
 
 
+-- ----------------------------------------
+-- DO NOT CHANGE BELOW LINE
+-- ----------------------------------------
+
+
+
 function strRepeat(count, char)
   if count <= 0 then
     return ""
@@ -42,63 +48,4 @@ function padRight(str, size, char)
     return str
   end
   return str .. strRepeat(len, char)
-end
-
-
-
--- ----------------------------------------
--- numbers
-
-
-
-function padZeros(value, size)
-  local valueStr = tostring(value)
-  local pos = string.find(valueStr, ".", 1, true)
-  if pos == nil then
-    if size <= 0 then
-      return valueStr
-    end
-    return valueStr .. "." .. strRepeat(size, "0")
-  end
-  pos = size - (string.len(valueStr) - pos)
-  if pos > 0 then
-    return valueStr .. strRepeat(pos, "0")
-  end
-  return valueStr
-end
-
-
-
-function floor(value, places)
-    local power = 10 ^ places
-    return math.floor(value * power) / power
-end
-
-
-
-function formatDec(value, places, width)
-  local str = ""
-  -- billion
-  if value >= 900000000 or value <= -900000000 then
-    str = padZeros(floor(
-      value / 1000000000.0,
-      places
-    ), places).."B"
-  -- million
-  elseif value >= 900000 or value <= -900000 then
-    str = padZeros(floor(
-      value / 1000000.0,
-      places
-    ), places).."M"
-  -- thousand
-  elseif value >= 900 or value <= -900 then
-    str = padZeros(floor(
-      value / 1000.0,
-      places
-    ), places).."K"
-  -- default
-  else
-    str = tostring(value).." "
-  end
-  return padLeft(str, width)
 end
