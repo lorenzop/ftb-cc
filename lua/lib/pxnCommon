@@ -144,6 +144,40 @@ end
 
 
 -- ----------------------------------------
+-- peripherals
+
+
+
+function DetectPeripherals(title, type)
+  local periphs = {}
+  peripheral.find(
+    type,
+    function(name)
+      local p = peripheral.wrap(name)
+      table.insert(periphs, p)
+      return true
+    end
+  )
+  local s = "s"
+  if #periphs ~= 1 then
+    s = ""
+  end
+  print("Found " .. #periphs .. " " .. title .. s)
+  sleepdot(1, 3) println()
+  return periphs
+end
+function DetectPeripheralsRequired(title, type)
+  local periphs =
+    DetectPeripherals(title, type)
+  if isEmpty(periphs) then
+    pos(1, 1) error("No " .. title .. "s detected!") sleepdot(1) return
+  end
+  return periphs
+end
+
+
+
+-- ----------------------------------------
 -- files
 
 
