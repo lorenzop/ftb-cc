@@ -10,53 +10,14 @@ os.loadAPI("/lib/pxnReactor")
 
 
 
-local UpdateDelay   = 5
-
-
-
 -- ----------------------------------------
--- do not change below line
-
-
-
--- ----------------------------------------
--- global functions
-
-
-
-shutdown = function() pxnCommon.shutdown() end
-
-clear   = function()         pxnMonitors.clear()           end
-pos     = function(x, y)     pxnMonitors.pos(x, y)         end
-center  = function(msg)      pxnMonitors.center(msg)       end
-print   = function(msg, mon) pxnMonitors.print(msg, mon)   end
-println = function(msg, mon) pxnMonitors.println(msg, mon) end
-sleepdot = function(time, dots) pxnMonitors.sleepdot(time, dots) end
-
-
-
+-- DO NOT CHANGE BELOW LINE
 -- ----------------------------------------
 
 
 
-pxnCommon.InstallStartup(
-  "reactor",
-  "lib/pxnReactor",
-  "lib/pxnBatteries"
-)
+pxnCommon.InstallStartup("reactor")
+pxnMonitors.Detect()
 
-
-
-local reactor =
-  pxnReactor.DetectReactor()
-pxnMonitors.DetectMonitors()
-
-
-
-println()
-println("Inserting rods 100%")
-reactor.setAllControlRodLevels(100.0)
-println("Reactor is ready to start")
-println()
-print("Press [space] to pause or [t] to exit")
-sleepdot(1.5)
+pxnReactor.Detect()
+pxnReactor.Start()
