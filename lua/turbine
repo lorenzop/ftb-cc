@@ -1,0 +1,23 @@
+-- ----------------------------------------
+-- PoiXson - Turbine Controller
+-- license GPL-3
+-- author lorenzo at poixson.com
+-- link http://ftb.poixson.com/lua/
+-- ----------------------------------------
+os.loadAPI("/lib/pxnCommon")
+os.loadAPI("/lib/pxnTurbine")
+-- ----------------------------------------
+
+
+
+-- ----------------------------------------
+-- DO NOT CHANGE BELOW LINE
+-- ----------------------------------------
+
+
+
+pxnCommon.InstallStartup("turbine")
+pxnMonitors.Detect()
+
+pxnTurbine.Detect()
+pxnTurbine.Start()
