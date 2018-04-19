@@ -15,8 +15,7 @@
 
 os.loadAPI("/lib/pxnStrings")
 os.loadAPI("/lib/pxnMonitors")
-
-
+os.loadAPI("/lib/pxnKeyPressListener")
 
 stopping = false
 

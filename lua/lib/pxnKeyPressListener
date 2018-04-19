@@ -1,0 +1,62 @@
+-- ----------------------------------------
+-- PoiXson - Key Press Listener
+-- license GPL-3
+-- author lorenzo at poixson.com
+-- link http://ftb.poixson.com/lua/
+-- ----------------------------------------
+
+
+
+-- ----------------------------------------
+-- DO NOT CHANGE BELOW LINE
+-- ----------------------------------------
+
+
+
+binds = {}
+
+
+
+-- ----------------------------------------
+-- global functions
+
+
+
+isStopping = function()  return pxnCommon.isStopping()  end
+shutdown   = function()  return pxnCommon.shutdown()    end
+
+
+
+
+
+function clear()
+  binds = {}
+end
+
+
+
+function register(key, func)
+  binds[key] = func
+end
+
+
+
+function Run()
+  while true do
+    if isStopping() then
+      break
+    end
+    local event, param = os.pullEventRaw()
+    if event == "terminate" then
+      shutdown()
+      return
+    end
+    if event == "key" then
+      local key = keys.getName(param)
+      local func = binds[key]
+      if func ~= nil then
+        func()
+      end
+    end
+  end
+end
