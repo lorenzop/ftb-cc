@@ -52,13 +52,38 @@ end
 
 
 
+function Start()
+  clear()
+  center("Inserting control rods", 2)
+  for _, react in ipairs(reactors) do
+    react.setAllControlRodLevels(100.0)
   end
-  local perf = peripheral.wrap(name)
-  if perf == nil then
-    pos(1, 1) error("Failed to detect reactor") sleepdot(1) return
+  center("Reactor is ready to start", 4)
+  sleepdot(2)
+  parallel.waitForAll(
+    KeyPressListener,
+    MainLoop
+  )
+end
+
+
+
+function MainLoop()
+  while true do
+    if isStopping() then
+      break
+    end
+    
+    
+    shutdown()
+    
   end
-  println()
-  println("Found Reactor:")
-  println("  " .. name)
-  return perf
+end
+
+
+
+function KeyPressListener()
+
+
+
 end
