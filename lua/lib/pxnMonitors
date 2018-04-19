@@ -39,55 +39,15 @@ notEmpty = function(str) return pxnCommon.notEmpty(str) end
 
 
 
-function DetectMonitors()
-  local filename = monitorsFilename
-  -- create monitors file
-  if pxnCommon.notFile(filename) then
-    clear()
-    println()
-    print("What side or name is the monitor? ")
-    local answer = io.read()
-    println()
-    local h = fs.open(filename, "w")
-    if h == nil then
-      pos(1, 1) error("Failed to create file: " .. filename) sleepdot(1) return
-    end
-    if notEmpty(answer) then
-      h.write(answer .. "\n")
-    end
-    h.close()
-    println()
-    print("Created file: " .. filename)
-    sleepdot(1)
+function Detect()
+  monitors =
+    pxnCommon.DetectPeripherals(
+      "monitor",
+      "monitor"
+    )
+end
   end
-  -- read monitors file
-  local lines = pxnCommon.readLinesFromFile(filename)
-  if lines ~= nil and #lines > 0 then
-    local index = 0
-    local found = {}
-    for _, name in ipairs(lines) do
-      if notEmpty(name) then
-        if index == 0 then
-          println()
-          println("Found Monitors:")
-        end
-        index = index + 1
-        if peripheral.isPresent(name) then
-          println("  " .. name)
-          local mon = peripheral.wrap(name)
-          if mon == nil then
-            pos(1, 1) error("Failed to load monitor: " .. name) sleepdot(1) return
-          end
-          found[index] = mon
-          mon.clear()
-          mon.setCursorPos(1, 1)
-          mon.write("Detected: " .. name .. "\n")
-        else
-          pos(1, 1) error("Monitor not found: " .. name) sleepdot(1) return
-        end
       end
-    end -- end for
-    monitors = found
   end
 end
 
