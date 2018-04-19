@@ -45,24 +45,15 @@ clear()
 
 
 
-function InstallStartup(scriptFile, ...)
+function InstallStartup(scriptFile)
   local filename = "/startup"
   if notFile(filename) then
+    clear()
+    println()
     println("Creating startup file..")
     local h = fs.open(filename, "w")
     if h == nil then
       pos(1, 1) error("Failed to create file: " .. filename) sleepdot(1) return
-    end
-    dl = function(filename)
-      println("  " .. filename)
-      h.write( "shell.run( \"dl " .. filename .. "\" )\n" )
-    end
-    dl(scriptFile)
-    dl("lib/pxnCommon")
-    dl("lib/pxnStrings")
-    dl("lib/pxnMonitors")
-    for _, v in ipairs(arg) do
-      dl(v)
     end
     h.write( "term.clear() term.setCursorPos(1, 1)\n" )
     h.write( "shell.run( \"" .. scriptFile .. "\")\n" )
