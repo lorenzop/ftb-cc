@@ -7,12 +7,9 @@
 
 
 
-monitorsFilename = "/configs/monitor_names"
-
-
-
 -- ----------------------------------------
--- do not change below line
+-- DO NOT CHANGE BELOW LINE
+-- ----------------------------------------
 
 
 
@@ -46,34 +43,88 @@ function Detect()
       "monitor"
     )
 end
+
+
+
+-- ----------------------------------------
+-- print
+
+
+
+function print(msg, mon)
+  if isEmpty(msg) then
+    return
   end
-      end
-  end
-end
-
-
-
-function clear(mon)
   if mon == nil then
-    term.clear()
-    term.setBackgroundColor(bgColor)
-    term.clear()
-    term.setCursorPos(1, 1)
+    print(msg, term)
     for _, mon in ipairs(monitors) do
-      mon.clear()
-      mon.setBackgroundColor(bgColor)
-      mon.clear()
-      mon.setCursorPos(1, 1)
+      if mon ~= nil then
+        print(msg, mon)
+      end
     end
   else
-    mon.clear()
-    mon.setBackgroundColor(bgColor)
-    mon.clear()
-    mon.setCursorPos(1, 1)
+    mon.write(msg)
   end
-  posX = 1
-  posY = 1
 end
+function println(msg, mon)
+  posY = posY + 1
+  if msg == nil then
+    pos(1, posY, mon)
+  else
+    print(msg, mon)
+    pos(1, posY, mon)
+  end
+end
+
+
+
+function center(msg, y, mon)
+  if y == nil then
+    y = posY
+  end
+  if mon == nil then
+    center(msg, y, term)
+    for _, mon in ipairs(monitors) do
+      center(msg, y, mon)
+    end
+    return
+  end
+  local sizeX, sizeY = mon.getSize()
+  local len = string.len(msg)
+  mon.setCursorPos(
+    math.floor( ((sizeX - len) / 2.0) + 1.0 ),
+    y
+  )
+  mon.write(msg)
+  posX = 1
+  posY = y
+end
+function right(msg, y, mon)
+  if y == nil then
+    y = posY
+  end
+  if mon == nil then
+    right(msg, y, term)
+    for _, mon in ipairs(monitors) do
+      right(msg, y, mon)
+    end
+    return
+  end
+  local sizeX, sizeY = mon.getSize()
+  local len = string.len(msg)
+  mon.setCursorPos(
+    (sizeX - len) + 1,
+    y
+  )
+  mon.write(msg)
+  posX = 1
+  posY = y
+end
+
+
+
+-- ----------------------------------------
+-- screen
 
 
 
@@ -153,78 +204,28 @@ end
 
 
 
--- ----------------------------------------
--- print
-
-
-
-function print(msg, mon)
-  if isEmpty(msg) then
-    return
-  end
+function clear(mon)
+  -- clear all monitors
   if mon == nil then
-    print(msg, term)
+    term.clear()
+    term.setBackgroundColor(bgColor)
+    term.clear()
+    term.setCursorPos(1, 1)
     for _, mon in ipairs(monitors) do
-      if mon ~= nil then
-        print(msg, mon)
-      end
+      mon.clear()
+      mon.setBackgroundColor(bgColor)
+      mon.clear()
+      mon.setCursorPos(1, 1)
     end
+  -- clear specific monitor
   else
-    mon.write(msg)
+    mon.clear()
+    mon.setBackgroundColor(bgColor)
+    mon.clear()
+    mon.setCursorPos(1, 1)
   end
-end
-function println(msg, mon)
-  if msg == nil then
-    pos(1, posY + 1, mon)
-  else
-    print(msg, mon)
-    pos(1, posY + 1, mon)
-  end
-end
-
-
-
-function center(msg, y, mon)
-  if y == nil then
-    y = posY
-  end
-  if mon == nil then
-    center(msg, y, term)
-    for _, mon in ipairs(monitors) do
-      center(msg, y, mon)
-    end
-    return
-  end
-  local sizeX, sizeY = mon.getSize()
-  local len = string.len(msg)
-  mon.setCursorPos(
-    math.floor( ((sizeX - len) / 2.0) + 1.0 ),
-    y
-  )
-  mon.write(msg)
   posX = 1
-  posY = y + 1
-end
-function right(msg, y, mon)
-  if y == nil then
-    y = posY
-  end
-  if mon == nil then
-    right(msg, y, term)
-    for _, mon in ipairs(monitors) do
-      right(msg, y, mon)
-    end
-    return
-  end
-  local sizeX, sizeY = mon.getSize()
-  local len = string.len(msg)
-  mon.setCursorPos(
-    (sizeX - len) + 1,
-    y
-  )
-  mon.write(msg)
-  posX = 1
-  posY = y + 1
+  posY = 1
 end
 
 
