@@ -7,12 +7,9 @@
 
 
 
-startupDelay  = 5
-
-
-
 -- ----------------------------------------
--- do not change below line
+-- DO NOT CHANGE BELOW LINE
+-- ----------------------------------------
 
 
 
@@ -22,7 +19,6 @@ os.loadAPI("/lib/pxnMonitors")
 
 
 stopping = false
-monitors = {}
 
 
 
@@ -31,11 +27,11 @@ monitors = {}
 
 
 
-clear   = function()         pxnMonitors.clear()           end
-pos     = function(x, y)     pxnMonitors.pos(x, y)         end
-center  = function(msg)      pxnMonitors.center(msg)       end
-print   = function(msg, mon) pxnMonitors.print(msg, mon)   end
-println = function(msg, mon) pxnMonitors.println(msg, mon) end
+clear    = function()           pxnMonitors.clear()              end
+pos      = function(x, y)       pxnMonitors.pos(x, y)            end
+print    = function(msg, mon)   pxnMonitors.print(msg, mon)      end
+println  = function(msg, mon)   pxnMonitors.println(msg, mon)    end
+center   = function(msg, y)     pxnMonitors.center(msg, y)       end
 sleepdot = function(time, dots) pxnMonitors.sleepdot(time, dots) end
 
 
@@ -51,7 +47,7 @@ clear()
 
 function InstallStartup(scriptFile, ...)
   local filename = "/startup"
-  if not isFile(filename) then
+  if notFile(filename) then
     println("Creating startup file..")
     local h = fs.open(filename, "w")
     if h == nil then
@@ -77,22 +73,21 @@ end
 
 
 
+function isStopping()
+  return stopping
+end
 function shutdown()
-  stopping = true
-  for i=0,3 do
-    pos(1, 1) center("+------------------+")
-    pos(1, 2) center("|                  |")
-    pos(1, 3) center(
-      "|    Stopping"
-      .. pxnStrings.strRepeat(i,   ".")
-      .. pxnStrings.strRepeat(3-i, " ")
-      .. "   |"
-    )
-    pos(1, 4) center("|                  |")
-    pos(1, 5) center("+------------------+")
-    pos(1, 1)
-    os.sleep(0.25)
+  if stopping then
+    return
   end
+  stopping = true
+  center("+------------------+", 1)
+  center("|                  |", 2)
+  center("|                  |", 3)
+  center("|                  |", 4)
+  center("+------------------+", 5)
+  center("Stopping ", 3)
+  sleepdot(1.5, 3)
   clear()
 end
 
@@ -137,8 +132,7 @@ end
 
 
 function getTicks()
-  return ( ((os.time() * 1000.0) + 18000) % 24000 )
-         + (os.day() * 24000)
+  return ( ((os.time() * 1000.0) + 18000) % 24000 ) + (os.day() * 24000)
 end
 
 
