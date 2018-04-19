@@ -1,0 +1,97 @@
+-- ----------------------------------------
+-- PoiXson - Turbine Tools
+-- license GPL-3
+-- author lorenzo at poixson.com
+-- link http://ftb.poixson.com/lua/
+-- ----------------------------------------
+
+
+
+-- ----------------------------------------
+-- DO NOT CHANGE BELOW LINE
+-- ----------------------------------------
+
+
+
+turbines = {}
+
+
+
+-- ----------------------------------------
+-- global functions
+
+
+
+isEmpty  = function(str) return pxnCommon.isEmpty(str)  end
+notEmpty = function(str) return pxnCommon.notEmpty(str) end
+
+isStopping = function()  return pxnCommon.isStopping()  end
+shutdown   = function()  return pxnCommon.shutdown()    end
+
+clear    = function()           pxnMonitors.clear()              end
+pos      = function(x, y)       pxnMonitors.pos(x, y)            end
+print    = function(msg, mon)   pxnMonitors.print(msg, mon)      end
+println  = function(msg, mon)   pxnMonitors.println(msg, mon)    end
+center   = function(msg, y)     pxnMonitors.center(msg, y)       end
+sleepdot = function(time, dots) pxnMonitors.sleepdot(time, dots) end
+
+
+
+-- ----------------------------------------
+-- turbine functions
+
+
+
+function Detect()
+  turbines =
+    pxnCommon.DetectPeripheralsRequired(
+      "turbine",
+      "BigReactors-Turbine"
+    )
+end
+
+
+
+function Start()
+  clear()
+  local highestRpm = 0
+  for _, turb in ipairs(turbines) do
+    turb.setFluidFlowRateMax(0)
+    if turb.getInductorEngaged() then
+      os.sleep(1)
+      turb.setInductorEngaged(false)
+    end
+    local rpm = turb.getRotorSpeed()
+    if rpm > highestRpm then
+      highestRpm = rpm
+    end
+  end
+  if highestRpm == 0 then
+    center("< idle >", 4)
+  else
+    center("< " .. highestRpm .. " rpm >", 4)
+  end
+  center("Turbines are ready to start", 2)
+  sleepdot(2)
+  pxnKeyPressListener.clear()
+  pxnKeyPressListener.register("q", shutdown)
+  parallel.waitForAll(
+    MainLoop,
+    pxnKeyPressListener.Run
+  )
+end
+
+
+
+function MainLoop()
+  while true do
+    if isStopping() then
+      break
+    end
+    
+    
+--    shutdown()
+os.sleep(1)
+    
+  end
+end
