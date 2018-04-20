@@ -99,7 +99,7 @@ function isTableEmpty(table)
   if table == nil then
     return true
   end
-  for _, _ in ipairs do
+  for _,_ in ipairs(table) do
     return false
   end
   return true
@@ -108,7 +108,7 @@ function notTableEmpty(table)
   if table == nil then
     return false
   end
-  for _, _ in ipairs do
+  for _,_ in ipairs(table) do
     return true
   end
   return false

@@ -57,9 +57,9 @@ function print(msg, mon)
   end
   if mon == nil then
     print(msg, term)
-    for _, mon in ipairs(monitors) do
-      if mon ~= nil then
-        print(msg, mon)
+    for _,m in ipairs(monitors) do
+      if m ~= nil then
+        print(msg, m)
       end
     end
   else
@@ -84,8 +84,9 @@ function center(msg, y, mon)
   end
   if mon == nil then
     center(msg, y, term)
-    for _, mon in ipairs(monitors) do
-      center(msg, y, mon)
+    for _,m in ipairs(monitors) do
+      center(msg, y, m)
+    end
     end
     return
   end
@@ -105,8 +106,8 @@ function right(msg, y, mon)
   end
   if mon == nil then
     right(msg, y, term)
-    for _, mon in ipairs(monitors) do
-      right(msg, y, mon)
+    for _,m in ipairs(monitors) do
+      right(msg, y, m)
     end
     return
   end
@@ -130,8 +131,8 @@ end
 
 function setMonitorScale(scale, mon)
   if mon == nil then
-    for _, mon in monitors do
-      setMonitorScale(scale, mon)
+    for _,m in ipairs(monitors) do
+      m.setTextScale(scale)
     end
     return
   end
@@ -150,8 +151,8 @@ function pos(x, y, mon)
   end
   if mon == nil then
     term.setCursorPos(posX, posY)
-    for _, mon in ipairs(monitors) do
-      mon.setCursorPos(posX, posY)
+    for _,m in ipairs(monitors) do
+      m.setCursorPos(posX, posY)
     end
   else
     mon.setCursorPos(posX, posY)
@@ -183,8 +184,8 @@ function setColor(color, mon)
   foreColor = color
   if mon == nil then
     term.setTextColor(color)
-    for _, mon in monitors do
-      mon.setTextColor(color)
+    for _,m in ipairs(monitors) do
+      m.setTextColor(color)
     end
   else
     mon.setTextColor(color)
@@ -194,8 +195,8 @@ function setBgColor(color, mon)
   bgColor = color
   if mon == nil then
     term.setBackgroundColor(color)
-    for _, mon in monitors do
-      mon.setBackgroundColor(color)
+    for _,m in ipairs(monitors) do
+      m.setBackgroundColor(color)
     end
   else
     mon.setBackgroundColor(color)
@@ -211,11 +212,11 @@ function clear(mon)
     term.setBackgroundColor(bgColor)
     term.clear()
     term.setCursorPos(1, 1)
-    for _, mon in ipairs(monitors) do
-      mon.clear()
-      mon.setBackgroundColor(bgColor)
-      mon.clear()
-      mon.setCursorPos(1, 1)
+    for _,m in ipairs(monitors) do
+      m.clear()
+      m.setBackgroundColor(bgColor)
+      m.clear()
+      m.setCursorPos(1, 1)
     end
   -- clear specific monitor
   else
