@@ -253,3 +253,54 @@ function sleepdot(time, dots)
     os.sleep(interval)
   end
 end
+
+
+
+
+function horizontalGraph(percent, text, y, colorFunc, mon)
+  local nextLine = false
+  if y == nil or y < 1 then
+    y = posY
+    nextLine = true
+  end
+  if mon == nil then
+    horizontalGraph(percent, text, y, colorFunc, term)
+    for _,m in ipairs(monitors) do
+      horizontalGraph(percent, text, y, colorFunc, m)
+    end
+    if nextLine then
+      pos(1, y + 1)
+    end
+    return
+  end
+  sizeX, sizeY = mon.getSize()
+  textPad = pxnStrings.padRight(text, sizeX)
+  origTextColor = mon.getTextColor()
+  origBackColor = mon.getBackgroundColor()
+  for x=1,sizeX,1 do
+    local foreColor, backColor = colorFunc(percent, x / sizeX)
+    if foreColor == nil then
+      mon.setTextColor(origTextColor)
+    else
+      mon.setTextColor(foreColor)
+    end
+    if backColor == nil then
+      mon.setBackgroundColor(origBackColor)
+    else
+      mon.setBackgroundColor(backColor)
+    end
+    pos(x, y, mon)
+    local char = string.sub(text, x, x + 1)
+    if char == nil or char == "" then char = " " end
+    mon.write(char)
+  end
+  if origTextColor ~= nil then
+    mon.setTextColor(origTextColor)
+  end
+  if origBackColor ~= nil then
+    mon.setBackgroundColor(origBackColor)
+  end
+  if nextLine then
+    pos(1, y + 1)
+  end
+end
