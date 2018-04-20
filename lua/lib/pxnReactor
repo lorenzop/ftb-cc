@@ -55,7 +55,7 @@ end
 function Start()
   clear()
   center("Inserting control rods", 2)
-  for _, react in ipairs(reactors) do
+  for _,react in ipairs(reactors) do
     react.setAllControlRodLevels(100.0)
   end
   center("Reactor is ready to start", 4)
@@ -71,7 +71,7 @@ end
 function MainLoop()
   while true do
     if isStopping() then
-      break
+      return
     end
     
     

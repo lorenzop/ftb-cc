@@ -192,6 +192,7 @@ end
 
 
 function setColor(color, mon)
+  if color == nil then return end
   foreColor = color
   if mon == nil then
     term.setTextColor(color)
@@ -203,6 +204,7 @@ function setColor(color, mon)
   end
 end
 function setBgColor(color, mon)
+  if color == nil then return end
   bgColor = color
   if mon == nil then
     term.setBackgroundColor(color)
