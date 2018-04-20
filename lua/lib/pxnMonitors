@@ -69,24 +69,28 @@ end
 function println(msg, mon)
   posY = posY + 1
   if msg == nil then
-    pos(1, posY, mon)
+    pos(1, nil, mon)
   else
     print(msg, mon)
-    pos(1, posY, mon)
+    pos(1, nil, mon)
   end
 end
 
 
 
 function center(msg, y, mon)
+  local nextLine = false
   if y == nil then
     y = posY
+    nextLine = true
   end
   if mon == nil then
     center(msg, y, term)
     for _,m in ipairs(monitors) do
       center(msg, y, m)
     end
+    if nextLine then
+      pos(1, y + 1)
     end
     return
   end
@@ -97,17 +101,23 @@ function center(msg, y, mon)
     y
   )
   mon.write(msg)
-  posX = 1
-  posY = y
+  if nextLine then
+    pos(1, y + 1)
+  end
 end
 function right(msg, y, mon)
+  local nextLine = false
   if y == nil then
     y = posY
+    nextLine = true
   end
   if mon == nil then
     right(msg, y, term)
     for _,m in ipairs(monitors) do
       right(msg, y, m)
+    end
+    if nextLine then
+      pos(1, y + 1)
     end
     return
   end
@@ -118,8 +128,9 @@ function right(msg, y, mon)
     y
   )
   mon.write(msg)
-  posX = 1
-  posY = y
+  if nextLine then
+    pos(1, y + 1)
+  end
 end
 
 
@@ -225,8 +236,7 @@ function clear(mon)
     mon.clear()
     mon.setCursorPos(1, 1)
   end
-  posX = 1
-  posY = 1
+  pos(1, 1)
 end
 
 
