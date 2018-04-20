@@ -13,11 +13,21 @@
 
 
 
+-- ----------------------------------------
+-- global functions
+
+
+
+isEmpty  = function(str) return pxnCommon.isEmpty(str)  end
+notEmpty = function(str) return pxnCommon.notEmpty(str) end
+
+
+
 function strRepeat(count, char)
-  if count <= 0 then
-    return ""
+  if count <= 0 then return "" end
+  if isEmpty(char) then
+    char = " "
   end
-  if pxnCommon.isEmpty(char) then char = " " end
   local str = ""
   for i=1,count,1 do
     str = str .. char
@@ -28,6 +38,8 @@ end
 
 
 function padLeft(str, size, char)
+  if size == nil then return str end
+  if size == 0   then return str end
   if isEmpty(char) then
     char = " "
   end
@@ -39,6 +51,8 @@ function padLeft(str, size, char)
   return strRepeat(len, char) .. str
 end
 function padRight(str, size, char)
+  if size == nil then return str end
+  if size == 0   then return str end
   if isEmpty(char) then
     char = " "
   end
