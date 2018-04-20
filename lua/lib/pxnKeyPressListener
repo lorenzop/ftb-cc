@@ -22,8 +22,8 @@ binds = {}
 
 
 
-isStopping = function()  return pxnCommon.isStopping()  end
-shutdown   = function()  return pxnCommon.shutdown()    end
+isStopping = function() return pxnCommon.isStopping() end
+shutdown   = function()        pxnCommon.shutdown()   end
 
 
 

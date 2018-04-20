@@ -25,8 +25,8 @@ turbines = {}
 isEmpty  = function(str) return pxnCommon.isEmpty(str)  end
 notEmpty = function(str) return pxnCommon.notEmpty(str) end
 
-isStopping = function()  return pxnCommon.isStopping()  end
-shutdown   = function()  return pxnCommon.shutdown()    end
+isStopping = function() return pxnCommon.isStopping() end
+shutdown   = function()        pxnCommon.shutdown()   end
 
 clear    = function()           pxnMonitors.clear()              end
 pos      = function(x, y)       pxnMonitors.pos(x, y)            end
