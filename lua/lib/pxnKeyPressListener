@@ -29,13 +29,13 @@ shutdown   = function()        pxnCommon.shutdown()   end
 
 
 
-function clear()
+function clearKeys()
   binds = {}
 end
 
 
 
-function register(key, func)
+function registerKey(key, func)
   binds[key] = func
 end
 
