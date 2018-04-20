@@ -7,6 +7,14 @@
 
 
 
+rpmTarget    = 1800
+changeFactor = 35.0
+targetChange = 20.0
+
+detailedBars = false
+
+
+
 -- ----------------------------------------
 -- DO NOT CHANGE BELOW LINE
 -- ----------------------------------------
@@ -14,6 +22,7 @@
 
 
 turbines = {}
+stats = {}
 
 
 
@@ -35,6 +44,10 @@ println  = function(msg, mon)   pxnMonitors.println(msg, mon)    end
 center   = function(msg, y)     pxnMonitors.center(msg, y)       end
 sleepdot = function(time, dots) pxnMonitors.sleepdot(time, dots) end
 
+strRepeat = function(count, char)     return pxnStrings.strRepeat(count, char)    end
+padLeft   = function(str, size, char) return pxnStrings.padLeft(str, size, char)  end
+padRight  = function(str, size, char) return pxnStrings.padRight(str, size, char) end
+
 
 
 -- ----------------------------------------
@@ -48,50 +61,278 @@ function Detect()
       "turbine",
       "BigReactors-Turbine"
     )
+  for index,_ in ipairs(turbines) do
+    local stat = {}
+    stat.flow          = 0
+    stat.flowPercent   = 0.0
+    stat.gen           = false
+    stat.energy        = 0
+    stat.energyChanged = 0.0
+    stat.maxEnergy     = 0.0
+    stat.maxEnergyUpdate = false
+    stat.energyPercent = 0.0
+    stat.rpm           = 0.0
+    stat.rpmError      = 0.0
+    stat.rpmChange     = 0.0
+    stat.rpmPercent    = 0.0
+    stat.adjust        = 0.0
+    stats[index] = stat
+  end
 end
 
 
 
 function Start()
-  clear()
-  local highestRpm = 0
-  for _, turb in ipairs(turbines) do
-    turb.setFluidFlowRateMax(0)
-    if turb.getInductorEngaged() then
-      os.sleep(1)
-      turb.setInductorEngaged(false)
-    end
-    local rpm = turb.getRotorSpeed()
-    if rpm > highestRpm then
-      highestRpm = rpm
-    end
-  end
-  if highestRpm == 0 then
-    center("< idle >", 4)
-  else
-    center("< " .. highestRpm .. " rpm >", 4)
-  end
-  center("Turbines are ready to start", 2)
-  sleepdot(2)
-  pxnKeyPressListener.clear()
-  pxnKeyPressListener.register("q", shutdown)
+  -- startup
   parallel.waitForAll(
-    MainLoop,
+    StartupLoop,
     pxnKeyPressListener.Run
   )
+end
+function StartupLoop()
+  pxnMonitors.setScale(1.0)
+  pxnKeyPressListener.clearKeys()
+  pxnKeyPressListener.registerKey("q", shutdown)
+  local dotCount = 3
+  for i=1,dotCount,1 do
+    for index,turb in ipairs(turbines) do
+      if isStopping() then break end
+      if i == 1 then
+        turb.setFluidFlowRateMax(0)
+        turb.setInductorEngaged(false)
+      end
+      local rpm = turb.getRotorSpeed()
+      if rpm == 0 then
+        center("< idle >", index + 6)
+      else
+        center("< " .. math.floor(rpm) .. " rpm >", index + 6)
+      end
+    end
+    local dots = pxnStrings.strRepeat(i, ".")
+    dots = dots .. pxnStrings.strRepeat(dotCount - i, " ")
+    center("Turbines are ready to start" .. dots, 5)
+    if isStopping() then break end
+    os.sleep(1)
+  end
+  MainLoop()
+end
+
+
+function MainLoop()
+  pxnKeyPressListener.clearKeys()
+  pxnKeyPressListener.registerKey("q", shutdown)
+  while true do
+    if isStopping() then
+      return
+    end
+    clear()
+
+    for index,turb in ipairs(turbines) do
+      pxnMonitors.posRelative(nil, 1)
+      local stat = stats[index]
+      TurbineLogic(stat, turb)
+
+      local indent = pxnStrings.strRepeat(2)
+      local colorFunc = nil
+
+      -- title line
+      local titleLine = " [Turbine " .. index .. "]"
+      println(titleLine)
+
+      -- rpm line
+      local changeStr = pxnNumbers.floorPad(stat.rpmChange, 2)
+      if stat.rpmChange > 0.0 then
+        changeStr = "+" .. changeStr
+      end
+      local rpmLine =
+        "   RPM: " .. pxnNumbers.floorPad(stat.rpm, 1, 7) ..
+        " " .. padLeft(changeStr, 7) ..
+        "  " .. pxnNumbers.floorPad(stat.rpmPercent * 100, 1, 3) .. "%"
+      colorFunc =
+        function(percentA, percentB)
+          local foreColor, backColor
+          foreColor = colors.white
+          if pxnNumbers.floor(percentA, 2) > 1.0 then
+            if percentA - 1.0 >= 1.0 - percentB then
+              backColor = colors.red
+            else
+              backColor = colors.blue
+            end
+          else
+            if percentA >= percentB then
+              backColor = colors.blue
+            else
+              backColor = colors.black
+            end
+          end
+          return foreColor, backColor
+        end
+      pxnMonitors.horizontalGraph(
+        stat.rpmPercent,
+        indent .. rpmLine,
+        nil,
+        colorFunc
+      )
+      if detailedBars then
+        pxnMonitors.horizontalGraph(
+          (stat.rpmPercent % 0.1) * 10,
+          "",
+          nil,
+          colorFunc
+        )
+      end
+
+      -- flow line
+      local adjustStr = pxnNumbers.floorPad(stat.adjust, 2)
+      if stat.adjust > 0.0 then
+        adjustStr = "+" .. adjustStr
+      end
+      local flowLine =
+        "  Flow: " .. pxnNumbers.floorPad(stat.flow, 1, 7) ..
+        " " .. padLeft(adjustStr, 7)
+      colorFunc =
+        function(percentA, percentB)
+          local foreColor, backColor
+          foreColor = colors.white
+          if percentA >= percentB then
+            backColor = colors.gray
+          else
+            backColor = colors.black
+          end
+          return foreColor, backColor
+        end
+      pxnMonitors.horizontalGraph(
+        stat.flowPercent,
+        indent .. flowLine,
+        nil,
+        colorFunc
+      )
+      if detailedBars then
+        pxnMonitors.horizontalGraph(
+          (stat.flowPercent % 0.1) * 10,
+          "",
+          nil,
+          colorFunc
+        )
+      end
+
+      -- energy line
+      local energyStr = pxnNumbers.floorPad(stat.energyChanged, 2)
+      if stat.energyChanged > 0.0 then
+        energyStr = "+" .. energyStr
+      end
+      local energyLine = "Energy: "
+      if stat.gen then
+        energyLine =
+          energyLine .. pxnNumbers.floorPad(stat.energy, 1, 7) ..
+          " " .. padLeft(energyStr, 7)
+      else
+        energyLine = energyLine .. " -disabled- "
+      end
+      colorFunc =
+        function(percentA, percentB)
+          local foreColor, backColor
+          foreColor = colors.white
+          if percentA >= percentB then
+            backColor = colors.brown
+          else
+            backColor = colors.black
+          end
+          return foreColor, backColor
+        end
+      pxnMonitors.horizontalGraph(
+        stat.energyPercent,
+        indent .. energyLine,
+        nil,
+        colorFunc
+      )
+      if stat.maxEnergyUpdate then
+        pxnMonitors.posRelative(nil, -1)
+        local origColor = term.getBackgroundColor()
+        pxnMonitors.setBgColor(colors.brown)
+        pxnMonitors.right("+++")
+        pxnMonitors.setBgColor(origColor)
+      end
+      if detailedBars then
+        pxnMonitors.horizontalGraph(
+          (stat.energyPercent % 0.1) * 10,
+          "",
+          nil,
+          colorFunc
+        )
+      end
+    end
+
+    os.sleep(0.5)
+  end
 end
 
 
 
-function MainLoop()
-  while true do
-    if isStopping() then
-      break
-    end
-    
-    
---    shutdown()
-os.sleep(1)
-    
+function TurbineLogic(stat, turb)
+  -- calculate energy
+  local energyLast = stat.energy
+  stat.energy = turb.getEnergyProducedLastTick()
+  if energyLast == nil then
+    energyLast = stat.energy
   end
+  stat.energyChanged = stat.energy - energyLast
+  if stat.energy > stat.maxEnergy then
+    stat.maxEnergy = stat.energy
+    stat.maxEnergyUpdate = true
+  else
+    stat.maxEnergyUpdate = false
+  end
+  stat.energyPercent = stat.energy / stat.maxEnergy
+
+  -- calculate rpm
+  local rpmLast = stat.rpm
+  stat.rpm = turb.getRotorSpeed()
+  stat.rpmError = rpmTarget - stat.rpm
+  if rpmLast == nil or rpmLast == 0 then
+    rpmLast = stat.rpm
+  end
+  stat.rpmChange  = stat.rpm - rpmLast
+  stat.rpmPercent = stat.rpm / rpmTarget
+
+  -- turbine disabled
+  if not turb.getActive() then
+    turb.setInductorEngaged(true)
+    turb.setFluidFlowRateMax(0)
+    return
+  end
+
+  -- calculate flow adjust
+  local changePercentError = 1.0 - (stat.rpmChange / targetChange)
+  local targetErrorPercent = 1.0 - stat.rpmPercent
+  local targetErrorFactor = targetErrorPercent
+  if targetErrorFactor >  0.5 then targetErrorFactor =  0.5 end
+  if targetErrorFactor < -0.5 then targetErrorFactor = -0.5 end
+  targetErrorFactor = targetErrorFactor * 2
+  stat.adjust = changePercentError * targetErrorFactor * changeFactor
+
+  -- induction coils
+  if stat.rpmPercent > 0.95 then
+    stat.gen = true
+  elseif stat.rpmPercent < 0.5 then
+    stat.gen = false
+  end
+
+  -- emergency break
+  if stat.rpm > 2000.0 then
+    stat.flow = stat.flow * 0.75
+    stat.gen = true
+  else
+    stat.flow = stat.flow + stat.adjust
+  end
+  if stat.flow < 0 then
+    stat.flow = 0
+  end
+  if stat.flow > 2000 then
+    stat.flow = 2000
+  end
+
+  stat.flowPercent = stat.flow / 2000.0
+  turb.setInductorEngaged(stat.gen)
+  turb.setFluidFlowRateMax(stat.flow)
 end
