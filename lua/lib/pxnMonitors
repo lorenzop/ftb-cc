@@ -140,7 +140,7 @@ end
 
 
 
-function setMonitorScale(scale, mon)
+function setScale(scale, mon)
   if mon == nil then
     for _,m in ipairs(monitors) do
       m.setTextScale(scale)
